@@ -1114,23 +1114,30 @@
     const reader = new FileReader();
     reader.onload = function(e) {
       const cell = input.closest('.cl-cell');
-      // Remove existing img if any
-      const existing = cell.querySelector('img');
-      if (existing) existing.remove();
+      cell.innerHTML = '';
       const img = document.createElement('img');
       img.src = e.target.result;
       const lbIdx = lightboxImages.length;
       lightboxImages.push(e.target.result);
-      img.addEventListener('click', (ev) => { ev.stopPropagation(); openLightbox(lbIdx); });
-      cell.appendChild(img);
+      // Botón de cambiar foto (esquina)
+      const changeBtn = document.createElement('label');
+      changeBtn.title = 'Cambiar foto';
+      changeBtn.style.cssText = 'position:absolute;top:6px;right:6px;z-index:3;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:3px 8px;border-radius:20px;cursor:pointer;backdrop-filter:blur(4px);';
+      changeBtn.textContent = '✎ cambiar';
+      const newInput = document.createElement('input');
+      newInput.type = 'file'; newInput.accept = 'image/*';
+      newInput.style.display = 'none';
+      newInput.onchange = function() { loadCollage(this); };
+      changeBtn.appendChild(newInput);
+      // Clic en imagen abre lightbox
+      img.addEventListener('click', () => openLightbox(lbIdx));
       cell.classList.add('has-img');
-      // Move input to stay on top
-      cell.appendChild(input);
+      cell.appendChild(img);
+      cell.appendChild(changeBtn);
     };
     reader.readAsDataURL(input.files[0]);
   }
 
-  // Keep loadCatPhoto as alias for backwards compat
   function loadCatPhoto(index, input) { loadCollage(input); }
 
   // Effect images
@@ -1142,6 +1149,10 @@
       container.innerHTML = '';
       const img = document.createElement('img');
       img.src = e.target.result;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in;';
+      const lbIdx = lightboxImages.length;
+      lightboxImages.push(e.target.result);
+      img.addEventListener('click', (ev) => { ev.stopPropagation(); openLightbox(lbIdx); });
       const newInput = document.createElement('input');
       newInput.type = 'file'; newInput.accept = 'image/*';
       newInput.style.cssText = 'position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;';
@@ -1174,6 +1185,10 @@
         container.innerHTML = '';
         const img = document.createElement('img');
         img.src = e.target.result;
+        img.style.cssText = 'cursor:zoom-in;';
+        const lbIdx = lightboxImages.length;
+        lightboxImages.push(e.target.result);
+        img.addEventListener('click', (ev) => { ev.stopPropagation(); openLightbox(lbIdx); });
         const newInput = document.createElement('input');
         newInput.type = 'file'; newInput.accept = 'image/*,video/*';
         newInput.style.cssText = 'position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;';
